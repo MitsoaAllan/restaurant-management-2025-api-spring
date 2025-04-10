@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DishOrderRest {
+    private String name;
     private int quantity;
     private Status actualStatus;
 

@@ -5,7 +5,6 @@ import hei.school.restaurant.model.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
