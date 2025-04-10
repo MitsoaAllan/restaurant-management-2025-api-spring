@@ -3,7 +3,10 @@ package hei.school.restaurant.dao.operations.order;
 import hei.school.restaurant.dao.DataSource;
 import hei.school.restaurant.dao.mapper.order.OrderMapper;
 import hei.school.restaurant.dao.operations.CRUDOperations;
+import hei.school.restaurant.model.order.DishOrder;
 import hei.school.restaurant.model.order.Order;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
@@ -11,14 +14,16 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 
 @Repository
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class OrderCRUDOperations implements CRUDOperations<Order> {
     private final DataSource dataSource;
     private final OrderMapper orderMapper;
+
 
     @Override
     public List<Order> getAll(Integer page, Integer size) {
@@ -50,4 +55,44 @@ public class OrderCRUDOperations implements CRUDOperations<Order> {
             }
         }
     }
+
+    public List<DishOrder> confirmDishOrders(List<DishOrder> dishOrders, int idOrder) {
+        String sql = """
+                INSERT INTO dish_order_status (id_order, id_dish, status, created_datetime)
+                VALUES (?,?,'CONFIRMED'::status,now()) ON CONFLICT (status) DO NOTHING
+                """;
+        dishOrders.forEach(dishOrder->{
+            try(Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql))
+            {
+                ps.setInt(1,idOrder);
+                ps.setInt(2,dishOrder.getDish().getId());
+                ps.executeUpdate();
+            }catch (SQLException e){
+                throw new RuntimeException(e);
+            }
+        });
+        return dishOrders;
+    }
+
+
+
+    public void confirmOrder(int idOrder){
+        String sql = """
+                INSERT INTO order_status (id_order, status, created_datetime)
+                VALUES
+                (?,'CONFIRMED'::status,now())
+                ON CONFLICT (status)
+                DO NOTHING
+                """;
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql))
+        {
+            ps.setInt(1,idOrder);
+            ps.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
 }
