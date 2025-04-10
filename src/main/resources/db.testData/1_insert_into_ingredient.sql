@@ -1,0 +1,1 @@
+insert into ingredient (id,name) values (1,'Saucisse') on conflict (id) do update set name=excluded.name

@@ -1,0 +1,1 @@
+INSERT INTO "order" (id_order, reference, created_datetime) VALUES (1,'T01','2025-03-19 05:21:48.113833')
