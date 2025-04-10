@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,6 +24,11 @@ public class Ingredient {
         this.id = id;
         this.name = name;
         this.prices = prices;
+    }
+
+    public Ingredient(int id,String name){
+        this.id = id;
+        this.name = name;
     }
 
     public Double getActualPrice(){
@@ -42,5 +49,40 @@ public class Ingredient {
         stockMovementList.forEach(stockMovement -> stockMovement.setIngredient(this));
         getStockMovements().addAll(stockMovementList);
         return getStockMovements();
+    }
+
+    public Double getPriceAt(LocalDateTime date){
+        return prices.stream()
+                .filter(p-> !p.getCreatedDateTime().isAfter(date))
+                .max(Comparator.comparing(Price::getCreatedDateTime))
+                .map(Price::getAmount)
+                .orElse(getActualPrice());
+    }
+
+    public Double getAvailableQuantity(){
+        Double in = stockMovements.stream()
+                .filter((m)->m.getMoveType().equals(StockMovementType.IN))
+                .map(StockMovement::getQuantity)
+                .reduce(0.0, Double::sum);
+        Double out = stockMovements.stream()
+                .filter((m)->m.getMoveType().equals(StockMovementType.OUT))
+                .map(StockMovement::getQuantity)
+                .reduce(0.0, Double::sum);
+
+        return in - out;
+    }
+
+    public double getAvailableQuantity(LocalDateTime date){
+        double in = stockMovements.stream()
+                .filter(m->!m.getCreatedDatetime().isAfter(date))
+                .filter((m)->m.getMoveType().equals(StockMovementType.IN))
+                .map(StockMovement::getQuantity)
+                .reduce(0.0, Double::sum);
+        double out = stockMovements.stream()
+                .filter(m->m.getCreatedDatetime().isAfter(date))
+                .filter((m)->m.getMoveType().equals(StockMovementType.OUT))
+                .map(StockMovement::getQuantity)
+                .reduce(0.0, Double::sum);
+        return in - out;
     }
 }
