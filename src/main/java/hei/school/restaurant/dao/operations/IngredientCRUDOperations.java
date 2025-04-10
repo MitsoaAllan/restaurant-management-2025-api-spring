@@ -1,7 +1,9 @@
 package hei.school.restaurant.dao.operations;
 
 import hei.school.restaurant.dao.DataSource;
+import hei.school.restaurant.dao.mapper.DishIngredientMapper;
 import hei.school.restaurant.dao.mapper.IngredientMapper;
+import hei.school.restaurant.model.DishIngredient;
 import hei.school.restaurant.model.Ingredient;
 import hei.school.restaurant.model.Price;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +34,7 @@ public class IngredientCRUDOperations implements CRUDOperations<Ingredient> {
          int defaultSize = (size != null) ? size : 10;
         List<Ingredient> ingredients = new ArrayList<>();
         try(Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT i.id,i.name FROM ingredient i LIMIT ? OFFSET ?"))
+            PreparedStatement ps = conn.prepareStatement("SELECT i.id,i.name FROM ingredient i ORDER BY i.id LIMIT ? OFFSET ?");)
         {
             ps.setInt(1, defaultSize);
             ps.setInt(2, (defaultPage-1)*defaultSize);
@@ -62,7 +64,30 @@ public class IngredientCRUDOperations implements CRUDOperations<Ingredient> {
         }catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public Ingredient findByIdDish(int idIngredient) {
+        String sql = """
+                SELECT id, name
+                FROM ingredient
+                JOIN dish_ingredient di
+                ON ingredient.id = di.id_ingredient
+                WHERE di.id_ingredient=?
+                ORDER BY id
+            """;
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql))
+        {
+            ps.setInt(1,idIngredient);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return ingredientMapper.apply(rs);
+                }
+                throw new RuntimeException("Ingredient.id=" + idIngredient + " not found");
+            }
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SneakyThrows
