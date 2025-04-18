@@ -55,9 +55,12 @@ public class OrderService {
         };
     }
 
-    public long calculateProcessingTime(
-            int dishId, String startDate, String endDate,
-            TimeUnit unit, CalculationType calculationType
+    public double calculateProcessingTime(
+            int dishId,
+            String startDate,
+            String endDate,
+            TimeUnit unit,
+            CalculationType calculationType
     ) {
         List<DishOrderStatus> inProgressList = dishOrderStatusCRUDOperations.findByDishIdAndStatusAndDateRange(
                 dishId, Status.IN_PROGRESS, startDate, endDate
@@ -66,7 +69,8 @@ public class OrderService {
                 dishId, Status.FINISHED, startDate, endDate
         );
 
-        List<Long> durations = inProgressList.stream()
+        // Calcul des durées en secondes
+        List<Double> durations = inProgressList.stream()
                 .filter(inProgress -> finishedList.stream()
                         .anyMatch(finished -> isMatchingPair(inProgress, finished)))
                 .map(inProgress -> {
@@ -74,20 +78,30 @@ public class OrderService {
                             .filter(f -> f.getCreatedDatetime().isAfter(inProgress.getCreatedDatetime()))
                             .findFirst()
                             .orElseThrow();
-                    return Duration.between(
+                    return (double) Duration.between(
                             inProgress.getCreatedDatetime(),
                             finished.getCreatedDatetime()
                     ).getSeconds();
                 })
                 .toList();
 
-        long resultInSeconds = switch (calculationType) {
-            case AVERAGE -> (long) durations.stream().mapToLong(Long::longValue).average().orElse(0);
-            case MINIMUM -> durations.stream().mapToLong(Long::longValue).min().orElse(0);
-            case MAXIMUM -> durations.stream().mapToLong(Long::longValue).max().orElse(0);
+        // Appliquer le type de calcul (MOYEN, MIN, MAX)
+        double result = switch (calculationType) {
+            case AVERAGE -> durations.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+            case MINIMUM -> durations.stream().mapToDouble(Double::doubleValue).min().orElse(0);
+            case MAXIMUM -> durations.stream().mapToDouble(Double::doubleValue).max().orElse(0);
         };
 
-        return convertDuration(resultInSeconds, unit);
+        // Convertir selon l'unité demandée
+        return convertToTimeUnit(result, unit);
+    }
+
+    private double convertToTimeUnit(double durationInSeconds, TimeUnit unit) {
+        return switch (unit) {
+            case SECONDS -> durationInSeconds;
+            case MINUTES -> durationInSeconds / 60;
+            case HOURS -> durationInSeconds / 3600;
+        };
     }
 
     private boolean isMatchingPair(DishOrderStatus inProgress, DishOrderStatus finished) {
