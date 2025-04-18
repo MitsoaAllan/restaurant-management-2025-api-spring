@@ -16,10 +16,10 @@ public class StockMovementMapper implements Function<ResultSet, StockMovement> {
     public StockMovement apply(ResultSet resultSet) {
         StockMovement stockMovement = new StockMovement();
         stockMovement.setId(resultSet.getInt("id"));
-        stockMovement.setMoveType(StockMovementType.valueOf(resultSet.getString("move")));
+        stockMovement.setType(StockMovementType.valueOf(resultSet.getString("move")));
         stockMovement.setQuantity(resultSet.getDouble("quantity"));
         stockMovement.setUnit(Unit.valueOf(resultSet.getString("unit")));
-        stockMovement.setCreatedDatetime(resultSet.getTimestamp("created_datetime").toLocalDateTime());
+        stockMovement.setCreationDatetime(resultSet.getTimestamp("created_datetime").toLocalDateTime());
         return stockMovement;
     }
 }

@@ -13,6 +13,6 @@ public class StockMovementRest {
     private int id;
     private Double quantity;
     private Unit unit;
-    private StockMovementType moveType;
-    private LocalDateTime createdDatetime;
+    private StockMovementType type;
+    private LocalDateTime creationDatetime;
 }

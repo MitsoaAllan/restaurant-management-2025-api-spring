@@ -14,15 +14,16 @@ import java.time.LocalDateTime;
 public class StockMovement {
     private int id;
     private Ingredient ingredient;
-    private StockMovementType moveType;
+    private StockMovementType type;
     private Double quantity;
     private Unit unit;
-    private LocalDateTime createdDatetime;
+    private LocalDateTime creationDatetime;
 
-    public StockMovement(StockMovementType moveType,Double quantity, Unit unit, LocalDateTime createdDatetime) {
-        this.moveType = moveType;
+    public StockMovement(int id,StockMovementType type, Double quantity, Unit unit, LocalDateTime creationDatetime) {
+        this.id = id;
+        this.type = type;
         this.quantity = quantity;
         this.unit = unit;
-        this.createdDatetime = createdDatetime;
+        this.creationDatetime = creationDatetime;
     }
 }

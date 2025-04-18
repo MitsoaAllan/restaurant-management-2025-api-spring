@@ -33,19 +33,20 @@ public class StockMovementCRUDOperations implements CRUDOperations<StockMovement
 
         List<StockMovement> stockMovements = new ArrayList<>();
         String sql = """
-                insert into stock_movement (id_ingredient, move, quantity, unit, created_datetime)
-                values ( ?, ?::stock_movement_type, ?, ?::unit, ?)
+                insert into stock_movement (id,id_ingredient, move, quantity, unit, created_datetime)
+                values (?, ?, ?::stock_movement_type, ?, ?::unit, ?)
                 returning id, id_ingredient, move,quantity, unit, created_datetime""";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
             entities.forEach(entityToSave -> {
                 try {
-                    statement.setInt(1, id);
-                    statement.setString(2, entityToSave.getMoveType().name());
-                    statement.setDouble(3, entityToSave.getQuantity());
-                    statement.setString(4, entityToSave.getUnit().name());
-                    statement.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+                    statement.setInt(1, entityToSave.getId());
+                    statement.setInt(2,id);
+                    statement.setString(3, entityToSave.getType().name());
+                    statement.setDouble(4, entityToSave.getQuantity());
+                    statement.setString(5, entityToSave.getUnit().name());
+                    statement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
                     statement.addBatch(); // group by batch so executed as one query in database
                 } catch (SQLException e) {
                     throw new ServerException(e);

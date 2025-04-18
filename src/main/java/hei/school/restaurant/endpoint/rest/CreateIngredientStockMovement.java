@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 public class CreateIngredientStockMovement {
-    private StockMovementType moveType;
+    private int id;
     private Double quantity;
     private Unit unit;
-    private LocalDateTime createdDatetime;
+    private StockMovementType type;
+    private LocalDateTime creationDatetime;
 }

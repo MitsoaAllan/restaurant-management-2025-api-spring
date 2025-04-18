@@ -14,8 +14,8 @@ public class StockMovementRestMapper implements Function<StockMovement, StockMov
                 stockMovement.getId(),
                 stockMovement.getQuantity(),
                 stockMovement.getUnit(),
-                stockMovement.getMoveType(),
-                stockMovement.getCreatedDatetime()
+                stockMovement.getType(),
+                stockMovement.getCreationDatetime()
         );
     }
 }
