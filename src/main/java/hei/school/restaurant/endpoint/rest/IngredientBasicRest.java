@@ -3,19 +3,16 @@ package hei.school.restaurant.endpoint.rest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-
-
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
-public class IngredientRest {
+@Setter
+public class IngredientBasicRest {
     private int id;
     private String name;
     private Double actualPrice;
-    private Double availableQuantity;
-    private List<PriceRest> prices;
-    private List<StockMovementRest> stockMovements;
+    private Double actualStock;
 
 }

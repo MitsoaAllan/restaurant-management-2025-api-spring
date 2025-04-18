@@ -66,7 +66,7 @@ public class IngredientCRUDOperations implements CRUDOperations<Ingredient> {
         }
     }
 
-    public Ingredient findByIdDish(int idIngredient) {
+    public Ingredient findByIdIngredient(int idIngredient) {
         String sql = """
                 SELECT id, name
                 FROM ingredient

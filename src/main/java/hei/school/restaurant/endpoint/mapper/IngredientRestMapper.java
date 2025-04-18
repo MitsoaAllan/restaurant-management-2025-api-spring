@@ -36,6 +36,8 @@ public class IngredientRestMapper {
         return new IngredientRest(
                 ingredient.getId(),
                 ingredient.getName(),
+                ingredient.getActualPrice(),
+                ingredient.getAvailableQuantity(),
                 prices,
                 stockMovements
         );

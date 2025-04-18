@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -61,11 +60,11 @@ public class Ingredient {
 
     public Double getAvailableQuantity(){
         Double in = stockMovements.stream()
-                .filter((m)->m.getMoveType().equals(StockMovementType.IN))
+                .filter((m)->m.getType().equals(StockMovementType.IN))
                 .map(StockMovement::getQuantity)
                 .reduce(0.0, Double::sum);
         Double out = stockMovements.stream()
-                .filter((m)->m.getMoveType().equals(StockMovementType.OUT))
+                .filter((m)->m.getType().equals(StockMovementType.OUT))
                 .map(StockMovement::getQuantity)
                 .reduce(0.0, Double::sum);
 
@@ -74,13 +73,13 @@ public class Ingredient {
 
     public double getAvailableQuantity(LocalDateTime date){
         double in = stockMovements.stream()
-                .filter(m->!m.getCreatedDatetime().isAfter(date))
-                .filter((m)->m.getMoveType().equals(StockMovementType.IN))
+                .filter(m->!m.getCreationDatetime().isAfter(date))
+                .filter((m)->m.getType().equals(StockMovementType.IN))
                 .map(StockMovement::getQuantity)
                 .reduce(0.0, Double::sum);
         double out = stockMovements.stream()
-                .filter(m->m.getCreatedDatetime().isAfter(date))
-                .filter((m)->m.getMoveType().equals(StockMovementType.OUT))
+                .filter(m->m.getCreationDatetime().isAfter(date))
+                .filter((m)->m.getType().equals(StockMovementType.OUT))
                 .map(StockMovement::getQuantity)
                 .reduce(0.0, Double::sum);
         return in - out;

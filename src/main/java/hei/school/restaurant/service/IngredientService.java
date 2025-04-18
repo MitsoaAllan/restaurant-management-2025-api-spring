@@ -1,6 +1,8 @@
 package hei.school.restaurant.service;
 
 import hei.school.restaurant.dao.operations.IngredientCRUDOperations;
+import hei.school.restaurant.dao.operations.PriceCRUDOperations;
+import hei.school.restaurant.dao.operations.StockMovementCRUDOperations;
 import hei.school.restaurant.model.Ingredient;
 import hei.school.restaurant.model.Price;
 import hei.school.restaurant.model.StockMovement;
@@ -14,6 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IngredientService {
     private final IngredientCRUDOperations ingredientCRUDOperations;
+    private final StockMovementCRUDOperations stockMovementCRUDOperations;
+    private final PriceCRUDOperations priceCRUDOperations;
 
     public List<Ingredient> findByPrices(Double priceMinFilter, Double priceMaxFilter,int page, int size) {
         if(priceMinFilter != null && priceMaxFilter != null && priceMinFilter > priceMaxFilter) {
@@ -62,15 +66,15 @@ public class IngredientService {
     public Ingredient addPrices(int ingredientId, List<Price> pricesToAdd) {
         Ingredient ingredient = ingredientCRUDOperations.findById(ingredientId);
         ingredient.addPrices(pricesToAdd);
-        List<Ingredient> ingredientsSaved = ingredientCRUDOperations.saveAll(List.of(ingredient));
-        return ingredientsSaved.getFirst();
+        priceCRUDOperations.saveAll(pricesToAdd,ingredientId);
+        return ingredient;
     }
 
     public Ingredient addStockMovements(int ingredientId, List<StockMovement> stockMovementsToAdd) {
         Ingredient ingredient = ingredientCRUDOperations.findById(ingredientId);
         ingredient.addStockMovements(stockMovementsToAdd);
-        List<Ingredient> ingredientsSaved = ingredientCRUDOperations.saveAll(List.of(ingredient));
-        return ingredientsSaved.getFirst();
+        stockMovementCRUDOperations.saveAll(stockMovementsToAdd,ingredientId);
+        return ingredient;
     }
 
 }
