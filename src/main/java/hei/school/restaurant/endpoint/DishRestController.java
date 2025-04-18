@@ -1,5 +1,6 @@
 package hei.school.restaurant.endpoint;
 
+import hei.school.restaurant.dao.operations.DishCRUDOperations;
 import hei.school.restaurant.endpoint.mapper.DishIngredientRestMapper;
 import hei.school.restaurant.endpoint.mapper.DishRestMapper;
 import hei.school.restaurant.endpoint.rest.CreateDishIngredient;
@@ -22,6 +23,7 @@ import java.util.List;
 public class DishRestController {
     private final DishService dishService;
     private final DishRestMapper dishRestMapper;
+    private final DishCRUDOperations dishCRUDOperations;
 
     @GetMapping("/dishes")
     public ResponseEntity<Object> getDishes(
@@ -30,10 +32,7 @@ public class DishRestController {
     ) {
         List<Dish> dishes = dishService.getAll(page, size);
         List<DishRest> dishRests = dishes.stream().map(
-                dish -> {
-                    DishRest dishRest = dishRestMapper.toRest(dish);
-                    return dishRest;
-                }
+                dishRestMapper::toRest
         ).toList();
         return ResponseEntity.status(HttpStatus.OK).body(dishRests);
     }
@@ -43,11 +42,13 @@ public class DishRestController {
         List<DishIngredient> ingredients = dishIngredients.stream()
                 .map(ingredient->
                         new DishIngredient(
-                            new Ingredient(ingredient.getIngredient().getId(),ingredient.getIngredient().getName()),
-                            ingredient.getRequiredQuantity(),
-                            ingredient.getUnit())
+                                new Ingredient(ingredient.getId(), ingredient.getName()),
+                                ingredient.getRequiredQuantity(),
+                                ingredient.getUnit()
+                        )
                 ).toList();
-        Dish ingredient = dishService.addDishes(id,ingredients);
-        return ResponseEntity.status(HttpStatus.OK).body(ingredient);
+        dishService.addDishes(id,ingredients);
+        Dish dish = dishCRUDOperations.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(dishRestMapper.toRest(dish));
     }
 }
