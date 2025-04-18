@@ -1,4 +1,4 @@
 CREATE TABLE IF NOT EXISTS "order"(
     id BIGSERIAL PRIMARY KEY,
-    reference VARCHAR NOT NULL UNIQUE
+    reference VARCHAR NOT NULL
 );
