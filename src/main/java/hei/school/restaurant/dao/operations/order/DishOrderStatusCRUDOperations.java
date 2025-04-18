@@ -5,11 +5,13 @@ import hei.school.restaurant.dao.mapper.order.DishOrderStatusMapper;
 import hei.school.restaurant.dao.operations.CRUDOperations;
 import hei.school.restaurant.model.Price;
 import hei.school.restaurant.model.order.DishOrderStatus;
+import hei.school.restaurant.model.order.Status;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,6 +101,29 @@ public class DishOrderStatusCRUDOperations implements CRUDOperations<DishOrderSt
                 }
                 throw new RuntimeException("Not saved");
             }
+        }
+    }
+
+    public List<DishOrderStatus> findByDishIdAndStatusAndDateRange(
+            int dishId, Status status, LocalDateTime startDate, LocalDateTime endDate
+    ) {
+        String query = "SELECT * FROM dish_order_status " +
+                "WHERE id_dish = ? AND status = ? " +
+                "AND created_datetime BETWEEN ? AND ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, dishId);
+            ps.setString(2, status.name());
+            ps.setObject(3, startDate);
+            ps.setObject(4, endDate);
+            ResultSet rs = ps.executeQuery();
+            List<DishOrderStatus> statuses = new ArrayList<>();
+            while (rs.next()) {
+                statuses.add(dishOrderStatusMapper.apply(rs));
+            }
+            return statuses;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
