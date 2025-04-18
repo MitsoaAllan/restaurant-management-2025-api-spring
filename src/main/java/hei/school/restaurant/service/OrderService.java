@@ -47,6 +47,14 @@ public class OrderService {
         return orderCRUDOperations.save(reference);
     }
 
+    private long convertDuration(long durationSeconds, TimeUnit unit) {
+        return switch (unit) {
+            case SECONDS -> durationSeconds;
+            case MINUTES -> durationSeconds / 60;
+            case HOURS -> durationSeconds / 3600;
+        };
+    }
+
     public long calculateProcessingTime(
             int dishId, LocalDateTime startDate, LocalDateTime endDate,
             TimeUnit unit, CalculationType calculationType
@@ -73,11 +81,13 @@ public class OrderService {
                 })
                 .toList();
 
-        return switch (calculationType) {
+        long resultInSeconds = switch (calculationType) {
             case AVERAGE -> (long) durations.stream().mapToLong(Long::longValue).average().orElse(0);
             case MINIMUM -> durations.stream().mapToLong(Long::longValue).min().orElse(0);
             case MAXIMUM -> durations.stream().mapToLong(Long::longValue).max().orElse(0);
         };
+
+        return convertDuration(resultInSeconds, unit);
     }
 
     private boolean isMatchingPair(DishOrderStatus inProgress, DishOrderStatus finished) {
