@@ -13,7 +13,8 @@ public class Price {
     private Double amount;
     private LocalDateTime createdDateTime;
 
-    public Price(Double amount, LocalDateTime createdDateTime) {
+    public Price(int id,Double amount, LocalDateTime createdDateTime) {
+        this.id = id;
         this.amount = amount;
         this.createdDateTime = createdDateTime;
     }
