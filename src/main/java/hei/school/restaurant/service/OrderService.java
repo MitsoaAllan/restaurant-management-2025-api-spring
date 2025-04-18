@@ -3,6 +3,7 @@ package hei.school.restaurant.service;
 import hei.school.restaurant.dao.operations.order.DishOrderCRUDOperations;
 import hei.school.restaurant.dao.operations.order.DishOrderStatusCRUDOperations;
 import hei.school.restaurant.dao.operations.order.OrderCRUDOperations;
+import hei.school.restaurant.dao.operations.order.OrderStatusCRUDOperations;
 import hei.school.restaurant.model.order.DishOrder;
 import hei.school.restaurant.model.order.DishOrderStatus;
 import hei.school.restaurant.model.order.Order;
@@ -17,19 +18,14 @@ public class OrderService {
     @Autowired private OrderCRUDOperations orderCRUDOperations;
     @Autowired private DishOrderCRUDOperations dishOrderCRUDOperations;
     @Autowired private DishOrderStatusCRUDOperations dishOrderStatusCRUDOperations;
+    @Autowired private OrderStatusCRUDOperations orderStatusCRUDOperations;
 
     public Order getDishByReference(String reference) {
         return orderCRUDOperations.findByReference(reference);
     }
 
-    public List<DishOrder> updateDishOrder(String reference, List<DishOrder> dishOrdersToUpdate) {
-        Order order = orderCRUDOperations.findByReference(reference);
-        if (order.getDishes().stream()
-                .allMatch(dish -> dish.getActualStatus() == Status.CONFIRMED)) {
-            orderCRUDOperations.confirmDishOrders(dishOrdersToUpdate, order.getId());
-            orderCRUDOperations.confirmOrder(order.getId());
-        }
-        return dishOrderCRUDOperations.saveAll(dishOrdersToUpdate,order.getId());
+    public Order updateDishOrder(String reference, List<DishOrder> dishOrdersToUpdate) {
+        return orderCRUDOperations.saveDishes(dishOrdersToUpdate,reference);
     }
 
     public DishOrderStatus updateStatus(String reference,int idDish, DishOrderStatus dishOrderStatus) {
@@ -40,5 +36,10 @@ public class OrderService {
                 .toList().getFirst();
         dishOrder.getStatusList().add(dishOrderStatus);
         return dishOrderStatusCRUDOperations.saveDishOrderStatus(dishOrderStatus,order.getId(),idDish);
+    }
+
+    public Order saveOrder(String reference) {
+        System.out.println(orderCRUDOperations.findByReference(reference));
+        return orderCRUDOperations.save(reference);
     }
 }
