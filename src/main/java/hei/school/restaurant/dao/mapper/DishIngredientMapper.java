@@ -22,7 +22,7 @@ public class DishIngredientMapper implements Function<ResultSet, DishIngredient>
     public DishIngredient apply(ResultSet resultSet) {
         DishIngredient dishIngredient = new DishIngredient();
         int idIngredient = resultSet.getInt("id_ingredient");
-        Ingredient ingredient = ingredientCRUDOperations.findByIdDish(idIngredient);
+        Ingredient ingredient = ingredientCRUDOperations.findByIdIngredient(idIngredient);
 
         dishIngredient.setIngredient(ingredient);
         dishIngredient.setRequiredQuantity(resultSet.getDouble("required_quantity"));
