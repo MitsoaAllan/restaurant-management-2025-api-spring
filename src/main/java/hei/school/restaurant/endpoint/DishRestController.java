@@ -57,8 +57,8 @@ public class DishRestController {
     @GetMapping("/dishes/{id}/processingTime")
     public ResponseEntity<?> getProcessingTime(
             @PathVariable int id,
-            @RequestParam LocalDateTime startDate,
-            @RequestParam LocalDateTime endDate,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
             @RequestParam(required = false, defaultValue = "SECONDS") TimeUnit unit,
             @RequestParam(required = false, defaultValue = "AVERAGE") CalculationType calculationType
     ) {

@@ -105,17 +105,17 @@ public class DishOrderStatusCRUDOperations implements CRUDOperations<DishOrderSt
     }
 
     public List<DishOrderStatus> findByDishIdAndStatusAndDateRange(
-            int dishId, Status status, LocalDateTime startDate, LocalDateTime endDate
+            int dishId, Status status, String startDate, String endDate
     ) {
         String query = "SELECT * FROM dish_order_status " +
-                "WHERE id_dish = ? AND status = ? " +
-                "AND created_datetime BETWEEN ? AND ?";
+                "WHERE id_dish = ? AND status = ?::status " +
+                "AND created_datetime BETWEEN ?::timestamp AND ?::timestamp";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, dishId);
             ps.setString(2, status.name());
-            ps.setObject(3, startDate);
-            ps.setObject(4, endDate);
+            ps.setString(3, startDate);
+            ps.setString(4, endDate);
             ResultSet rs = ps.executeQuery();
             List<DishOrderStatus> statuses = new ArrayList<>();
             while (rs.next()) {

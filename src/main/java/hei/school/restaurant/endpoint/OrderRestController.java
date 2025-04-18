@@ -1,23 +1,18 @@
 package hei.school.restaurant.endpoint;
 
 
-import hei.school.restaurant.dao.operations.order.OrderCRUDOperations;
 import hei.school.restaurant.dao.operations.order.OrderStatusCRUDOperations;
-import hei.school.restaurant.endpoint.mapper.CreateDishOrderMapper;
 import hei.school.restaurant.endpoint.mapper.OrderRestMapper;
 import hei.school.restaurant.endpoint.mapper.UpdateOrderRestMapper;
 import hei.school.restaurant.endpoint.rest.UpdateOrderRest;
-import hei.school.restaurant.model.order.DishOrder;
 import hei.school.restaurant.model.order.DishOrderStatus;
 import hei.school.restaurant.model.order.Order;
-import hei.school.restaurant.model.order.OrderStatus;
 import hei.school.restaurant.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @AllArgsConstructor

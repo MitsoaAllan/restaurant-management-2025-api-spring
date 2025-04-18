@@ -56,7 +56,7 @@ public class OrderService {
     }
 
     public long calculateProcessingTime(
-            int dishId, LocalDateTime startDate, LocalDateTime endDate,
+            int dishId, String startDate, String endDate,
             TimeUnit unit, CalculationType calculationType
     ) {
         List<DishOrderStatus> inProgressList = dishOrderStatusCRUDOperations.findByDishIdAndStatusAndDateRange(
