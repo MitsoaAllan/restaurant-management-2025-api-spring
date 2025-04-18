@@ -32,8 +32,12 @@ public class OrderMapper implements Function<ResultSet, Order> {
         Order order = new Order();
         order.setId(idOrder);
         order.setReference(reference);
-        order.setDishes(dishOrders);
-        order.setStatusList(orderStatuses);
+        if(!dishOrders.isEmpty()){
+            order.setDishes(dishOrders);
+        }
+        if(!orderStatuses.isEmpty()){
+            order.setStatusList(orderStatuses);
+        }
         return order;
     }
 }
