@@ -62,7 +62,7 @@ public class DishRestController {
             @RequestParam(required = false, defaultValue = "SECONDS") TimeUnit unit,
             @RequestParam(required = false, defaultValue = "AVERAGE") CalculationType calculationType
     ) {
-        long duration = orderService.calculateProcessingTime(id, startDate, endDate, unit, calculationType);
+        long duration = (long) orderService.calculateProcessingTime(id, startDate, endDate, unit, calculationType);
         return ResponseEntity.ok().body(new ProcessingTimeResponse(id, duration, unit, calculationType));
     }
 }
