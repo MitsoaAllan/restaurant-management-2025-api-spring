@@ -15,4 +15,9 @@ public class DishOrderStatus {
     private DishOrder dishOrder;
     private Status status;
     private LocalDateTime CreatedDatetime;
+
+    public DishOrderStatus(Status status){
+        this.status = status;
+        this.CreatedDatetime = LocalDateTime.now();
+    }
 }

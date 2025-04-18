@@ -15,4 +15,9 @@ public class OrderStatus {
     private Order order;
     private Status status;
     private LocalDateTime createdDatetime;
+
+    public OrderStatus(Status status) {
+        this.status = status;
+        this.createdDatetime =LocalDateTime.now();
+    }
 }
