@@ -5,7 +5,9 @@ import hei.school.restaurant.dao.mapper.order.DishOrderMapper;
 import hei.school.restaurant.dao.mapper.order.OrderMapper;
 import hei.school.restaurant.dao.operations.CRUDOperations;
 import hei.school.restaurant.model.order.DishOrder;
+import hei.school.restaurant.model.order.DishOrderStatus;
 import hei.school.restaurant.model.order.Order;
+import hei.school.restaurant.model.order.Status;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
@@ -47,6 +49,8 @@ public class DishOrderCRUDOperations implements CRUDOperations<DishOrder> {
                     ps.setDouble(3,item.getQuantity());
                     ps.executeQuery();
                     if (item.getStatusList() != null && !item.getStatusList().isEmpty()) {
+                        DishOrderStatus dishOrderStatus = new DishOrderStatus(Status.CREATED);
+                        dishOrderStatusCRUDOperations.saveAll(List.of(dishOrderStatus),idOrder,item.getDish().getId());
                         dishOrderStatusCRUDOperations.saveAll(item.getStatusList(),idOrder,item.getDish().getId());
                     }
                     ps.executeBatch();
@@ -86,26 +90,6 @@ public class DishOrderCRUDOperations implements CRUDOperations<DishOrder> {
 
         }catch (SQLException e){
             throw new RuntimeException(e);
-        }
-    }
-    @SneakyThrows
-    public List<DishOrder> updateByReference(List<DishOrder> dishOrders) {
-        String sql = """
-                update dish_order set quantity = ? where id_dish = ?
-                """;
-        try(Connection conn = dataSource.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql))
-        {
-            dishOrders.forEach(dishOrder1 -> {
-                try{
-                    ps.setInt(1,dishOrder1.getQuantity());
-                    ps.setInt(2,dishOrder1.getDish().getId());
-                    ps.executeUpdate();
-                }catch (SQLException e){
-                    throw new RuntimeException(e);
-                }
-            });
-            return dishOrders;
         }
     }
 }

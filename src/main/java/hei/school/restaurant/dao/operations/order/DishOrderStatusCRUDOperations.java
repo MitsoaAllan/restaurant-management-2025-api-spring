@@ -33,8 +33,8 @@ public class DishOrderStatusCRUDOperations implements CRUDOperations<DishOrderSt
     public List<DishOrderStatus> saveAll(List<DishOrderStatus> items,int idOrder,int idDish) {
         List<DishOrderStatus> newPrices = new ArrayList<>();
         try(Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement("insert into dish_order_status (id_order,id_dish,status,created_datetime) " +
-                    "values (?,?,?::status,?) on conflict (status) do nothing " +
+            PreparedStatement ps = conn.prepareStatement("insert into dish_order_status (id_order,id_dish,status) " +
+                    "values (?,?,?::status) on conflict (status) do nothing " +
                     "returning id_order,id_dish,status,created_datetime");)
         {
             items.forEach(item -> {
@@ -42,7 +42,6 @@ public class DishOrderStatusCRUDOperations implements CRUDOperations<DishOrderSt
                     ps.setInt(1, idOrder);
                     ps.setInt(2,idDish);
                     ps.setString(3, item.getStatus().toString());
-                    ps.setTimestamp(4, Timestamp.valueOf(item.getCreatedDatetime()));
                     ps.addBatch();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -85,8 +84,8 @@ public class DishOrderStatusCRUDOperations implements CRUDOperations<DishOrderSt
     @SneakyThrows
     public DishOrderStatus saveDishOrderStatus(DishOrderStatus dishOrderStatus,int idOrder,int idDish) {
         String sql = """
-                insert into dish_order_status (id_order, id_dish, status, created_datetime)
-                values (?,?,?::status,?) on conflict (status) do nothing returning id_order,id_dish,status,created_datetime
+                insert into dish_order_status (id_order, id_dish, status)
+                values (?,?,?::status) on conflict (status) do nothing returning id_order,id_dish,status,created_datetime
                 """;
         try(Connection conn = dataSource.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);)
@@ -94,7 +93,6 @@ public class DishOrderStatusCRUDOperations implements CRUDOperations<DishOrderSt
             ps.setInt(1, idOrder);
             ps.setInt(2, idDish);
             ps.setString(3, dishOrderStatus.getStatus().name());
-            ps.setTimestamp(4, Timestamp.valueOf(dishOrderStatus.getCreatedDatetime()));
             try(ResultSet rs = ps.executeQuery()){
                 if (rs.next()) {
                     return dishOrderStatusMapper.apply(rs);

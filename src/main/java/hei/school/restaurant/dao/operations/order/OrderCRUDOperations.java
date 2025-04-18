@@ -5,6 +5,8 @@ import hei.school.restaurant.dao.mapper.order.OrderMapper;
 import hei.school.restaurant.dao.operations.CRUDOperations;
 import hei.school.restaurant.model.order.DishOrder;
 import hei.school.restaurant.model.order.Order;
+import hei.school.restaurant.model.order.Status;
+import hei.school.restaurant.service.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,8 @@ import java.util.List;
 public class OrderCRUDOperations implements CRUDOperations<Order> {
     private final DataSource dataSource;
     private final OrderMapper orderMapper;
+    private final DishOrderCRUDOperations dishOrderCRUDOperations;
+    private final OrderStatusCRUDOperations orderStatusCRUDOperations;
 
 
     @Override
@@ -36,24 +40,54 @@ public class OrderCRUDOperations implements CRUDOperations<Order> {
     }
 
     @SneakyThrows
+    public Order save(String reference) {
+        String sql = """
+                INSERT INTO "order" (reference)
+                VALUES (?)
+                RETURNING id, reference
+                """;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, reference);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return orderMapper.apply(rs);
+                }else{
+                    throw new NotFoundException("Order not created");
+                }
+            }
+        }
+    }
+
+    @SneakyThrows
     public Order findByReference(String reference) {
         String sql = """
                 select o.id, o.reference
                 from "order" o
-                join order_status os on o.id = os.id_order
-                where o.reference ilike ?
+                where o.reference=?
                 """;
         try(Connection conn = dataSource.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql))
         {
-            ps.setString(1, "%"+reference+"%");
+            ps.setString(1, reference);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return orderMapper.apply(rs);
                 }
-                throw new Exception("Order: " + reference + " not found");
+                return null;
             }
         }
+    }
+
+    public Order saveDishes(List<DishOrder> dishOrders,String reference){
+        Order order = findByReference(reference);
+        if(order.getDishes() == null){
+            order.setDishes(dishOrders);
+        }else{
+            order.getDishes().addAll(dishOrders);
+        }
+        dishOrderCRUDOperations.saveAll(order.getDishes(),order.getId());
+        return order;
     }
 
     public List<DishOrder> confirmDishOrders(List<DishOrder> dishOrders, int idOrder) {
